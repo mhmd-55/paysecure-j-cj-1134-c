@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * FINDING 3 (Part C): session fixation. No session.invalidate()/regeneration after auth.
+ * FINDING 3 (Part C) — REMEDIATED.
+ * request.changeSessionId() issues a brand-new session ID at the moment of
+ * authentication, so any session ID an attacker fixed beforehand becomes invalid.
+ * Mohammad Ismail CJ-1134-C
  */
 @Controller
 public class AuthController {
@@ -25,9 +28,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
+    public String login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
         User user = userService.authenticate(username, password);
         if (user != null) {
+            HttpSession session = request.getSession(true); // ensure a session exists first
+            request.changeSessionId();                       // then rotate its ID
             session.setAttribute("username", user.getUsername());
             session.setAttribute("userId", user.getId());
             session.setAttribute("role", user.getRole());
@@ -52,17 +57,10 @@ public class AuthController {
         return "dashboard";
     }
 
-    /**
-     * Diagnostic-only endpoint for testing Finding 3 (session fixation).
-     * Echoes back whatever identity (if any) is currently attached to the
-     * caller's session, so we can directly observe session state rather than
-     * relying on a page like /dashboard that doesn't check authentication at all.
-     * Safe to remove after testing - not part of the assignment's required functionality.
-     */
     @GetMapping("/whoami")
     @org.springframework.web.bind.annotation.ResponseBody
     public String whoami(HttpServletRequest request) {
-        HttpSession session = request.getSession(false); // false = don't create one, just check
+        HttpSession session = request.getSession(false);
         if (session == null) {
             return "No session at all.";
         }
