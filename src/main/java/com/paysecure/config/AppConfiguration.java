@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * DB_PASSWORD and ENCRYPTION_KEY have no fallback default on purpose: if the
  * environment variable isn't set, these will be null and the app will fail
  * loudly at startup rather than silently falling back to a hardcoded value.
+ * Mohammad Ismail CJ-1134-C
  */
 @Configuration
 public class AppConfiguration {

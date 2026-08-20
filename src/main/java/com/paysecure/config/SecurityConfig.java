@@ -3,6 +3,8 @@ package com.paysecure.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -20,5 +22,14 @@ public class SecurityConfig {
             )
             .csrf(csrf -> csrf.disable());
         return http.build();
+    }
+
+    /**
+     * FINDING 2 (Part B) remediation: salted, adaptive password hashing.
+     * Work factor 12 - a deliberate slow-down that resists GPU cracking, unlike raw SHA-256.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
     }
 }
