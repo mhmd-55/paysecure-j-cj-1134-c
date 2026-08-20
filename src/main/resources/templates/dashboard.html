@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>PaySecure-J | Dashboard</title></head>
+<body>
+<h2>Dashboard <small>(CJ-1134-C)</small></h2>
+<ul>
+    <li><a href="/transactions/search?keyword=Coffee">Search transactions (Finding 4 - SQLi)</a></li>
+    <li><a href="/profile?userId=1434">View profile 1434 (Finding 5 - IDOR)</a></li>
+    <li>Admin delete: POST /admin/deleteUser?id=2434&amp;role=ADMIN (Finding 6)</li>
+    <li>Upload: POST /documents/upload (multipart "file") (Finding 7)</li>
+    <li><a href="/reset/request?username=testuser1434">Request reset token (Finding 8)</a></li>
+    <li>Transfer: POST /transfer?fromAccount=1&amp;toAccount=1434&amp;amount=349.80 (Finding 9)</li>
+    <li><a href="/profile?userId=notanumber">Trigger error page (Finding 10)</a></li>
+</ul>
+</body>
+</html>
