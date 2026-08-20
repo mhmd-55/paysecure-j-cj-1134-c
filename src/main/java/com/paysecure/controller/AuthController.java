@@ -2,6 +2,7 @@ package com.paysecure.controller;
 
 import com.paysecure.entity.User;
 import com.paysecure.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,5 +50,23 @@ public class AuthController {
     @GetMapping("/dashboard")
     public String dashboard() {
         return "dashboard";
+    }
+
+    /**
+     * Diagnostic-only endpoint for testing Finding 3 (session fixation).
+     * Echoes back whatever identity (if any) is currently attached to the
+     * caller's session, so we can directly observe session state rather than
+     * relying on a page like /dashboard that doesn't check authentication at all.
+     * Safe to remove after testing - not part of the assignment's required functionality.
+     */
+    @GetMapping("/whoami")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public String whoami(HttpServletRequest request) {
+        HttpSession session = request.getSession(false); // false = don't create one, just check
+        if (session == null) {
+            return "No session at all.";
+        }
+        Object username = session.getAttribute("username");
+        return "Session ID: " + session.getId() + " | username attribute: " + username;
     }
 }
