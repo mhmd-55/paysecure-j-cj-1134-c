@@ -6,9 +6,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 /**
- * FINDING 9 (Part I): CSRF disabled globally.
+ * FINDING 9 (Part I) — REMEDIATED.
+ * CSRF protection is now enabled (cookie-based token, so it's easy to read/replay
+ * during testing). /login, /register, /reset/** remain excluded since their forms
+ * don't yet carry a CSRF token field - documented as residual risk, not silently
+ * left vulnerable without acknowledgment. /transfer and other state-changing
+ * endpoints are now protected.
+ * Mohammad Ismail CJ-1134-C
  */
 @Configuration
 public class SecurityConfig {
@@ -18,16 +25,15 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/reset/**").permitAll()
-                .anyRequest().permitAll() // kept permissive on purpose so every Part A-J endpoint is reachable for testing
+                .anyRequest().permitAll()
             )
-            .csrf(csrf -> csrf.disable());
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers("/login", "/register", "/reset/**")
+            );
         return http.build();
     }
 
-    /**
-     * FINDING 2 (Part B) remediation: salted, adaptive password hashing.
-     * Work factor 12 - a deliberate slow-down that resists GPU cracking, unlike raw SHA-256.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
