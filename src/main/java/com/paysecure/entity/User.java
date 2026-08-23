@@ -1,6 +1,7 @@
 package com.paysecure.entity;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "users")
@@ -16,10 +17,17 @@ public class User {
     private String password;
     private String email;
 
-    @Column(name = "user_role") // "role" is a reserved word in MySQL 8+
+    @Column(name = "user_role")
     private String role;
 
-    private String resetToken;
+    @Column(name = "reset_token_hash")
+    private String resetTokenHash;
+
+    @Column(name = "reset_token_expiry")
+    private Instant resetTokenExpiry;
+
+    @Column(name = "reset_token_used")
+    private boolean resetTokenUsed;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -31,6 +39,10 @@ public class User {
     public void setEmail(String email) { this.email = email; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
-    public String getResetToken() { return resetToken; }
-    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+    public String getResetTokenHash() { return resetTokenHash; }
+    public void setResetTokenHash(String resetTokenHash) { this.resetTokenHash = resetTokenHash; }
+    public Instant getResetTokenExpiry() { return resetTokenExpiry; }
+    public void setResetTokenExpiry(Instant resetTokenExpiry) { this.resetTokenExpiry = resetTokenExpiry; }
+    public boolean isResetTokenUsed() { return resetTokenUsed; }
+    public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
 }
